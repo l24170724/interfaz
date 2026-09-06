@@ -71,6 +71,43 @@ A partir de La4, el resto de las notas se puede obtener de dos formas:
 
     Donde `n` es el número de semitonos de distancia (positivo si la nota es más aguda que La4, negativo si es más grave), y 12 es la cantidad de semitonos que tiene una octava completa.
 
+| Nota | Semitonos desde La4 |
+|---|---:|
+| La3 | -12 |
+| Do4 | -9 |
+| Mi4 | -5 |
+| La4 | 0 |
+| Do5 | +3 |
+| Mi5 | +7 |
+| La5 | +12 |
+
+*Tabla 3. Distancia en semitonos de algunas notas respecto a La4.*
+
+Aplicando la fórmula (o consultando una tabla de valores ya calculados) se obtienen las frecuencias necesarias para programar una melodía, sin tener que hacer el cálculo cada vez.
+
+| Nota | Frecuencia (Hz) |
+|---|---:|
+| La3 | 220,0 |
+| Do4 | 261,6 |
+| Mi4 | 329,6 |
+| La4 | 440,0 |
+| Do5 | 523,3 |
+| Mi5 | 659,3 |
+| La5 | 880,0 |
+
+*Tabla 4. Frecuencias de referencia para notas comunes.*
+
+Una melodía no es más que una lista de elementos, donde cada elemento trae tres datos. La frecuencia de la nota (o cero, si es un silencio), su duración, y si corresponde a un silencio o a un sonido. Los silencios son necesarios entre notas para que la melodía no se escuche como un solo tono continuo.
+
+```mermaid
+flowchart LR
+    A["La4: 440 Hz - 0.3s"] --> B["Silencio: 0 Hz - 0.05s"]
+    B --> C["Do5: 523.3 Hz - 0.3s"]
+    C --> D["Silencio: 0 Hz - 0.05s"]
+    D --> E["Mi5: 659.3 Hz - 0.3s"]
+```
+*Diagrama 2. Ejemplo de una melodía sencilla como secuencia de notas y silencios.*
+
 ## Conclusiones
 
 ## Bibliografía
