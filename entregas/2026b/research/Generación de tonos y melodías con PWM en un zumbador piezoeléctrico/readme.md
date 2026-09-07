@@ -12,7 +12,7 @@ El sonido es, en su forma más simple, una vibración mecánica que se propaga p
 - Periodo (T) - duración de una sola vibración completa (una vibración más corta implica más vibraciones por segundo, de ahí que f = 1/T).
 - Tono - forma en que el oído percibe la frecuencia; una frecuencia alta se percibe como un tono agudo y una frecuencia baja como un tono grave, la misma relación que un microcontrolador aprovecha para controlar el tono de un zumbador cambiando la frecuencia de su señal PWM [1].
 
-| Magnitud | Qué es | Relación |
+| Magnitud | ¿Qué es? | Relación |
 |---|---|---|
 | Frecuencia (f) | Vibraciones completas por segundo | f = 1/T |
 | Periodo (T) | Duración de una vibración completa | T = 1/f |
@@ -35,7 +35,7 @@ Un zumbador piezoeléctrico es, físicamente, un disco metálico delgado con una
 
 | Tipo | Oscilador interno | Señal que necesita | Permite variar el tono |
 |---|---|---|---|
-| Activo | Sí | Voltaje constante (encendido/apagado) | No, tono fijo de fábrica |
+| Activo | Sí | Voltaje constante (encendido/apagado) | No, el tono es fijo de fábrica |
 | Pasivo | No | Señal PWM de frecuencia variable | Sí |
 
 *Tabla 2. Zumbador activo y pasivo [3].*
@@ -56,7 +56,7 @@ flowchart LR
     B --> C["Onda de sonido en el aire"]
     C --> D["Tono percibido por el oido"]
 ```
-*Diagrama 1. Cadena completa entre la señal PWM y el tono percibido.*
+*Diagrama 1. Flujo de la señal PWM al tono percibido.*
 
 **Notas y melodías**
 
@@ -108,6 +108,83 @@ flowchart LR
 ```
 *Diagrama 2. Ejemplo de una melodía sencilla como secuencia de notas y silencios.*
 
+**Ejemplo de implementación en el RP2040**
+
+La Raspberry Pi Pico es una placa pequeña que usa un chip llamado RP2040 para controlar todo el hardware conectado a ella. Los pines que sobresalen de la placa se llaman GPIO, y son los que se conectan a componentes como el zumbador.
+
+El RP2040 no tiene un solo generador de señal PWM, tiene 8 generadores independientes llamados "slices", y cada slice puede producir 2 señales al mismo tiempo, llamadas "canal A" y "canal B". Cada pin GPIO ya tiene asignado, de fábrica, a qué slice y canal pertenece, siguiendo una fórmula fija. Por ejemplo, el GPIO 6 corresponde al slice 3, canal A.
+
+| Elemento | ¿Cómo se calcula? | Ejemplo (GPIO 6) |
+|---|---|---|
+| Slice asociado | Se divide el número de pin entre 2 | slice 3 |
+| Canal asociado | Se ve si el número de pin es par (canal A) o impar (canal B) | canal A |
+
+*Tabla 5. Mapeo de un pin GPIO a su slice y canal PWM [7].*
+
+Dentro de cada slice hay tres valores que se programan para generar la señal deseada:
+
+- DIV - funciona como un freno, ya que hace que el contador interno cuente más lento (el reloj del chip corre muy rápido por sí solo).
+- TOP - es el número hasta donde cuenta el slice antes de reiniciarse; define el período, y por lo tanto el tono.
+- CC - es el número hasta donde llega el contador antes de apagar la señal dentro del mismo ciclo; define el duty cycle, y por lo tanto el volumen.
+
+Estos tres valores se relacionan mediante la siguiente fórmula, que determina la frecuencia final de la señal PWM [7]:
+
+                                                f_PWM = f_sys / (DIV × (TOP + 1))
+
+Donde f_sys es la velocidad del reloj del chip (125 MHz, siempre fija). Con solo escribir DIV, TOP y CC, el hardware del chip genera la señal por sí solo, sin que el programador tenga que prender y apagar el pin manualmente.
+
+```mermaid
+flowchart TD
+    A["Reloj del chip (125 MHz)"] -->|"DIV lo hace mas lento"| B["Velocidad de conteo del slice"]
+    B -->|"cuenta de 0 hasta TOP y se reinicia"| C["Frecuencia de la señal (tono)"]
+    C -->|"CC define cuando se apaga en cada ciclo"| D["Duty cycle (volumen)"]
+```
+*Diagrama 3. Cómo los valores DIV, TOP y CC generan la señal PWM.*
+
+Conectar el zumbador solo requiere un cable que va del zumbador al pin GPIO configurado como salida PWM, y otro cable que va del zumbador a GND (tierra), sin necesitar ningún componente adicional.
+
+```mermaid
+flowchart LR
+    A["Pin GPIO (salida PWM)"] --> B["Zumbador piezoelectrico pasivo"]
+    B --> C["GND (tierra)"]
+```
+*Diagrama 4. Conexión física mínima del zumbador al microcontrolador.*
+
+**Cálculo del ejemplo anterior**
+
+La tabla 6 resume el cálculo completo para pasar de "se quiere 440 Hz" a los tres números reales que se escriben en los registros del slice.
+
+| Parámetro | Valor | ¿Cómo se obtiene? |
+|---|---|---|
+| f_sys | 125 MHz | Es fijo, siempre corre a esta velocidad |
+| DIV | 5 | Se elige libremente, buscando que el cálculo sea manejable |
+| TOP | 56817 | Se despeja de la fórmula del PWM, usando f_sys, DIV y la frecuencia deseada (440 Hz) |
+| CC | 28408 | Se calcula como TOP entre 2, para lograr un duty cycle de 50% |
+
+*Tabla 6. Cálculo numérico completo para generar 440 Hz [7].*
+
+Es decir, la velocidad del reloj (f_sys) siempre es la misma, así que solo se elige un valor de DIV, y con eso se calcula el TOP necesario para lograr la frecuencia deseada. Una vez que se tiene el TOP, se calcula el CC dividiendo TOP entre 2.
+
+Para reproducir una melodía completa, el firmware repite este mismo cálculo por cada nota o silencio de la melodía. Primero calcula el TOP correspondiente a esa frecuencia (o usa CC = 0 si es un silencio), después escribe los tres valores en los registros, y al final espera la duración indicada antes de pasar al siguiente elemento.
+
+```mermaid
+flowchart TD
+    A["Leer nota o silencio"] --> B["Calcular TOP y CC (o CC=0 si es silencio)"]
+    B --> C["Escribir DIV, TOP y CC"]
+    C --> D["Esperar la duracion programada"]
+    D --> E{"Quedan elementos?"}
+    E -->|"si"| A
+    E -->|"no"| F["Deshabilitar el slice"]
+```
+*Diagrama 5. Flujo completo para reproducir una melodía en el RP2040.*
+
+**Aplicaciones**
+
+- Alertas sonoras en electrodomésticos (microondas, lavadoras, ollas de cocción).
+- Notificaciones y alarmas en dispositivos médicos portátiles (bombas de infusión, monitores de paciente).
+- Señalización en electrónica automotriz (sensores de estacionamiento, recordatorios de cinturón).
+- Tonos de confirmación o error en teclados y pequeños dispositivos electrónicos [4].
+
 ## Conclusiones
 
 ## Bibliografía
@@ -124,5 +201,6 @@ flowchart LR
 
 [6] F. Gribenski, "Plenty of pitches," *Nature Physics*, vol. 16, p. 232, 2020. [En línea]. Disponible: https://www.nature.com/articles/s41567-019-0707-1
 
+[7] Raspberry Pi Ltd., *RP2040 Datasheet: A microcontroller by Raspberry Pi*, doc. RP-008371-DS. [En línea]. Disponible: https://pip.raspberrypi.com/documents/RP-008371-DS-rp2040-datasheet.pdf
 
 ### (Opcional) código, diagramas, esquemas y PDF de papers de referencia
