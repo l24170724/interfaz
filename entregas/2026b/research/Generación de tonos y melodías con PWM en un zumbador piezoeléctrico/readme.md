@@ -1,6 +1,11 @@
+<div align="center">
+    <img width="1280" height="500" alt="image" src="https://github.com/user-attachments/assets/05adb52e-1113-439b-8411-c6fedcc9fba7" />
+</div>
+
 # Generación de tonos y melodías con PWM en un zumbador piezoeléctrico
 
 ## Introducción
+Un microcontrolador se comunica con el mundo exterior (sensores, pantallas, zumbadores, entre otros) mediante periféricos, bloques de hardware que se exponen como registros de memoria y que el procesador configura con unas pocas escrituras, sin tener que generar él mismo cada señal eléctrica; el PWM es uno de esos periféricos, y aplicado sobre un zumbador piezoeléctrico permite controlar el tono de un sonido con solo cambiar la frecuencia programada en esos registros.
 
 ## Desarrollo Técnico
 
@@ -30,6 +35,10 @@ La piezoelectricidad tiene dos manifestaciones opuestas, y conviene distinguirla
 El zumbador emplea únicamente el efecto inverso (el microcontrolador aplica el voltaje y el disco responde deformándose), de modo que el efecto directo no vuelve a mencionarse más adelante. Cada vez que se aplica un voltaje al disco, este se deforma un poco (la carga eléctrica se transforma en movimiento); al retirarlo o invertirlo, el disco regresa o se deforma en sentido contrario, y repetir este ciclo muchas veces por segundo produce la vibración mecánica que después se convierte en sonido.
 
 **Zumbador piezoeléctrico**
+
+<div align="center">
+    <img width="400" height="300" alt="images" src="https://github.com/user-attachments/assets/a650af1e-417a-4d4a-8184-db46a4a0e936" />
+</div>
 
 Un zumbador piezoeléctrico es, físicamente, un disco metálico delgado con una lámina cerámica piezoeléctrica adherida encima (el diafragma); no requiere partes móviles adicionales ni bobinas, a diferencia de un altavoz convencional. Existen dos tipos, según la presencia o ausencia de un oscilador interno; esta diferencia determina cuál de los dos permite variar el tono desde el microcontrolador (el otro solo puede encenderse o apagarse, a una frecuencia fija de fábrica).
 
@@ -112,6 +121,10 @@ flowchart LR
 
 La Raspberry Pi Pico es una placa pequeña que usa un chip llamado RP2040 para controlar todo el hardware conectado a ella. Los pines que sobresalen de la placa se llaman GPIO, y son los que se conectan a componentes como el zumbador.
 
+<div align="center">
+    <img width="400" height="250" alt="sddefault" src="https://github.com/user-attachments/assets/efc1c80d-93ef-425e-a1bd-5f503b9d90d9" />
+</div>
+
 El RP2040 no tiene un solo generador de señal PWM, tiene 8 generadores independientes llamados "slices", y cada slice puede producir 2 señales al mismo tiempo, llamadas "canal A" y "canal B". Cada pin GPIO ya tiene asignado, de fábrica, a qué slice y canal pertenece, siguiendo una fórmula fija. Por ejemplo, el GPIO 6 corresponde al slice 3, canal A.
 
 | Elemento | ¿Cómo se calcula? | Ejemplo (GPIO 6) |
@@ -185,7 +198,8 @@ flowchart TD
 - Señalización en electrónica automotriz (sensores de estacionamiento, recordatorios de cinturón).
 - Tonos de confirmación o error en teclados y pequeños dispositivos electrónicos [4].
 
-## Conclusiones
+## Conclusión
+Puedo decir que, para hacer sonar un zumbador piezoeléctrico no hace falta ningún circuito especial de audio, solo aprovechar una función que el microcontrolador ya trae integrada. Una vez que se programan unos pocos valores, el propio chip se encarga de mantener la señal por su cuenta, sin necesitar ayuda extra del procesador, lo cual lo hace ideal para proyectos pequeños y de bajo consumo, ya que se logra un buen resultado con muy poco hardware adicional y casi sin exigirle trabajo al procesador.
 
 ## Bibliografía
 
@@ -203,4 +217,31 @@ flowchart TD
 
 [7] Raspberry Pi Ltd., *RP2040 Datasheet: A microcontroller by Raspberry Pi*, doc. RP-008371-DS. [En línea]. Disponible: https://pip.raspberrypi.com/documents/RP-008371-DS-rp2040-datasheet.pdf
 
-### (Opcional) código, diagramas, esquemas y PDF de papers de referencia
+## Asistencia de Inteligencia Artificial
+
+- **Prompts utilizados**:
+    - "¿Por qué una señal PWM puede utilizarse para producir sonido mediante un zumbador piezoeléctrico?"
+    - "¿Cuál es la diferencia entre el efecto piezoeléctrico directo y el efecto piezoeléctrico inverso?"
+    - "¿Cuál es la diferencia entre un zumbador piezoeléctrico activo y uno pasivo, cómo funciona cada uno y cuál permite generar diferentes tonos?"
+    - "¿El ciclo de trabajo de una señal PWM modifica el tono de un zumbador piezoeléctrico, el volumen, la forma de onda o alguna otra característica del sonido?"
+    - "¿Cómo funciona el PWM en el microcontrolador RP2040 utilizado por la Raspberry Pi Pico?"
+    - "¿Qué relación existe entre la frecuencia del reloj del microcontrolador y las frecuencias PWM que puede generar?"
+    - "¿Qué aplicaciones tiene la generación de tonos y melodías mediante PWM en un zumbador piezoeléctrico dentro de los sistemas embebidos?"
+
+- **Herramientas utilizadas**:
+    - ChatGPT
+    - Claude Code
+    - Copilot
+
+- **Cambios y validación**:
+    - Sobre el mapeo GPIO -> slice/canal y la fórmula de frecuencia PWM del RP2040, confirmé los valores contra el datasheet oficial de Raspberry Pi.
+    - El cálculo de TOP y CC para 440 Hz que dio la IA lo repetí de forma independiente para confirmar el valor.
+    - La IA confirmó que el duty cycle afecta el volumen y no el tono; verifiqué esto revisando cómo el efecto piezoeléctrico inverso convierte la frecuencia, no la proporción de encendido, en vibración.
+    - Las frecuencias de las notas musicales (La, Do, Mi en distintas octavas) que dio la IA las contrasté con una tabla independiente de frecuencias estándar y haciendo los cálculos por mi cuenta, confirmando que los valores eran correctos.
+    - Al preguntar por las aplicaciones del PWM en zumbadores, la IA mezcló aplicaciones generales de PWM (control de motores o brillo de LEDs) que no son específicas de un zumbador piezoeléctrico, así que identifiqué esa parte como ajena a mi tema y la excluí de mi trabajo.
+
+- **Reflexión personal**:
+La IA a veces mezcló información general de PWM con información específica del zumbador piezoeléctrico, sin distinguir cuál aplicaba realmente al tema que preguntaba. Esto me enseñó a revisar cada respuesta contra una fuente confiable antes de usar el dato, en lugar de aceptarlo solo porque sonaba coherente.
+
+- **Fecha**: 2026-09-xx
+- **Plataforma utilizada**: Raspberry Pi Pico (RP2040), como referencia conceptual de hardware.
