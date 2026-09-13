@@ -216,32 +216,3 @@ Puedo decir que, para hacer sonar un zumbador piezoeléctrico no hace falta ning
 [6] F. Gribenski, "Plenty of pitches," *Nature Physics*, vol. 16, p. 232, 2020. [En línea]. Disponible: https://www.nature.com/articles/s41567-019-0707-1
 
 [7] Raspberry Pi Ltd., *RP2040 Datasheet: A microcontroller by Raspberry Pi*, doc. RP-008371-DS. [En línea]. Disponible: https://pip.raspberrypi.com/documents/RP-008371-DS-rp2040-datasheet.pdf
-
-## Asistencia de Inteligencia Artificial
-
-- **Prompts utilizados**:
-    - "¿Por qué una señal PWM puede utilizarse para producir sonido mediante un zumbador piezoeléctrico?"
-    - "¿Cuál es la diferencia entre el efecto piezoeléctrico directo y el efecto piezoeléctrico inverso?"
-    - "¿Cuál es la diferencia entre un zumbador piezoeléctrico activo y uno pasivo, cómo funciona cada uno y cuál permite generar diferentes tonos?"
-    - "¿El ciclo de trabajo de una señal PWM modifica el tono de un zumbador piezoeléctrico, el volumen, la forma de onda o alguna otra característica del sonido?"
-    - "¿Cómo funciona el PWM en el microcontrolador RP2040 utilizado por la Raspberry Pi Pico?"
-    - "¿Qué relación existe entre la frecuencia del reloj del microcontrolador y las frecuencias PWM que puede generar?"
-    - "¿Qué aplicaciones tiene la generación de tonos y melodías mediante PWM en un zumbador piezoeléctrico dentro de los sistemas embebidos?"
-
-- **Herramientas utilizadas**:
-    - ChatGPT
-    - Claude Code
-    - Copilot
-
-- **Cambios y validación**:
-    - Sobre el mapeo GPIO -> slice/canal y la fórmula de frecuencia PWM del RP2040, confirmé los valores contra el datasheet oficial de Raspberry Pi.
-    - El cálculo de TOP y CC para 440 Hz que dio la IA lo repetí de forma independiente para confirmar el valor.
-    - La IA confirmó que el duty cycle afecta el volumen y no el tono; verifiqué esto revisando cómo el efecto piezoeléctrico inverso convierte la frecuencia, no la proporción de encendido, en vibración.
-    - Las frecuencias de las notas musicales (La, Do, Mi en distintas octavas) que dio la IA las contrasté con una tabla independiente de frecuencias estándar y haciendo los cálculos por mi cuenta, confirmando que los valores eran correctos.
-    - Al preguntar por las aplicaciones del PWM en zumbadores, la IA mezcló aplicaciones generales de PWM (control de motores o brillo de LEDs) que no son específicas de un zumbador piezoeléctrico, así que identifiqué esa parte como ajena a mi tema y la excluí de mi trabajo.
-
-- **Reflexión personal**:
-La IA a veces mezcló información general de PWM con información específica del zumbador piezoeléctrico, sin distinguir cuál aplicaba realmente al tema que preguntaba. Esto me enseñó a revisar cada respuesta contra una fuente confiable antes de usar el dato, en lugar de aceptarlo solo porque sonaba coherente.
-
-- **Fecha**: 2026-09-xx
-- **Plataforma utilizada**: Raspberry Pi Pico (RP2040), como referencia conceptual de hardware.
