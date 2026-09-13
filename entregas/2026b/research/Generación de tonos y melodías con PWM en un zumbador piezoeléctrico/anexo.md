@@ -10,9 +10,9 @@
     - "¿Qué aplicaciones tiene la generación de tonos y melodías mediante PWM en un zumbador piezoeléctrico dentro de los sistemas embebidos?"
 
 - **Herramientas utilizadas**:
-    - ChatGPT
-    - Claude Code
-    - Copilot
+    - ChatGPT (para pedir explicaciones de los conceptos iniciales)
+    - Claude Code (para aprender a usar el formato en el markdown y mermaid)
+    - Copilot (para revisar los ejemplos con el RP2040 (cálculo de TOP/CC, mapeo de slices/canales))
 
 - **Cambios y validación**:
     - Sobre el mapeo del GPIO en el slice/canal y la fórmula de frecuencia PWM del RP2040, confirmé los valores en el datasheet oficial de Raspberry Pi.
@@ -22,7 +22,7 @@
     - La IA me mencionó otros usos del PWM, como motores y LEDs, pero como no eran específicos de los zumbadores piezoeléctricos, decidí no incluirlos.
 
 - **Reflexión personal**:
-La IA a veces me mezcló información general de PWM con información específica del zumbador piezoeléctrico, sin ver realmente cuál aplicaba al tema que le preguntaba. Esto me enseñó a revisar cada respuesta contra una fuente confiable antes de usar el dato, en lugar de aceptarlo solo porque sonaba coherente.
+La IA a veces me mezcló información general de PWM con información específica del zumbador piezoeléctrico, sin ver realmente cuál aplicaba al tema que le preguntaba. Esto me enseñó a revisar cada respuesta contra una fuente confiable antes de usar el dato, en lugar de aceptarlo solo porque sonaba coherente. La próxima vez no aceptaría una respuesta general de la IA sin antes decirle bien el contexto específico, ya que eso fue lo que causó que mezclara información genérica de PWM con la del zumbador piezoeléctrico.
 
-- **Fecha**: 12-09-2026
+- **Fecha de asistencia de la IA**: del 01-09-2026 al 07-09-2026
 - **Plataforma utilizada**: Raspberry Pi Pico (RP2040), como referencia conceptual de hardware.
